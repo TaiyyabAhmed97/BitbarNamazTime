@@ -1,0 +1,1 @@
+#BitbarNamazTime
