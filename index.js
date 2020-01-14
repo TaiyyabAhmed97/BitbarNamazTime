@@ -1,51 +1,27 @@
 #!/usr/bin/env /usr/local/bin/node
-
-const axios = require("axios");
-//const readlinesync = require("readline-sync");
+const jsonData = require("./data.json");
 const bitbar = require("bitbar");
 const NAMAZES = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-var city = "Chicago";
-var country = "USA";
-
-var url = ` http://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=1&school=1`;
-
 // REgExp to extract 24hr formatted js time
 let pattern = /[0-9][0-9]:[0-9][0-9]/;
-
 const timeNow = pattern.exec(new Date())[0];
-
-// https call to get today's namazes
-
-axios
-  .get(url)
-  .then(response => {
-    timings = response.data.data;
-
-    // create array of times from namaz time object
-    let newNamazArr = [];
-    let temp = Object.keys(timings.timings);
-    for (var i = 0; i < temp.length; i++) {
-      if (NAMAZES.includes(temp[i])) {
-        newNamazArr.push(timings.timings[temp[i]]);
-      }
-    }
-
-    // get current namaz
-
-    let currentNamaz = getNamaz(newNamazArr, timeNow);
-
-    // get time diff from now till next namaz
-
-    // feed into bitbar
-    bitbar([
-      {
-        text: `${currentNamaz}, Time Left: ${"random"}`,
-        color: "blue",
-        dropdown: false
-      }
-    ]);
-  })
-  .catch(error => console.error(error));
+// read file's JSON data
+let newNamazArr = jsonData["newNamazArr"];
+// get current namaz
+let currentNamaz = getNamaz(newNamazArr, timeNow);
+// get time diff from now till next namaz
+let idx = NAMAZES.indexOf(currentNamaz);
+let namazTime = newNamazArr[idx == 5 ? 0 : idx + 1];
+// feed into bitbar
+bitbar([
+  {
+    text: `${
+      currentNamaz == "Sunrise" ? "No Namaz" : currentNamaz
+    }, Time Left: ${getDiff(namazTime, timeNow)}`,
+    color: "blue",
+    dropdown: false
+  }
+]);
 
 function getNamaz(namazes, timeNow) {
   //console.log(timeNow);
@@ -60,4 +36,22 @@ function getNamaz(namazes, timeNow) {
     }
   }
   return curr;
+}
+
+function getDiff(time1, time2) {
+  let time1mins =
+    parseInt(time1.substring(0, 2), 10) * 60 +
+    parseInt(time1.substring(3, time1.length), 10);
+  let time2mins =
+    parseInt(time2.substring(0, 2), 10) * 60 +
+    parseInt(time2.substring(3, time1.length), 10);
+  let diff = time1mins - time2mins;
+  var quotient = Math.floor(diff / 60);
+  var remainder = diff % 60;
+  return (
+    "" +
+    (quotient < 10 ? "0" + quotient : quotient) +
+    ":" +
+    (remainder < 10 ? "0" + remainder : remainder)
+  );
 }
