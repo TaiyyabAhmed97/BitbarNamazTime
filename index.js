@@ -18,7 +18,7 @@ bitbar([
     text: `${
       currentNamaz == "Sunrise" ? "No Namaz" : currentNamaz
     }, Time Left: ${getDiff(namazTime, timeNow)}`,
-    color: "blue",
+    color: getRandomColor(),
     dropdown: false
   }
 ]);
@@ -54,4 +54,12 @@ function getDiff(time1, time2) {
     ":" +
     (remainder < 10 ? "0" + remainder : remainder)
   );
+}
+function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
