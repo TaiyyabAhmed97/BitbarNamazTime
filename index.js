@@ -66,6 +66,3 @@ function getRandomColor() {
   }
   return color;
 }
-function sendDiff(str) {
-  return str;
-}
