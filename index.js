@@ -2,6 +2,7 @@
 const jsonData = require("./data.json");
 const bitbar = require("bitbar");
 const NAMAZES = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+var timediff;
 // REgExp to extract 24hr formatted js time
 let pattern = /[0-9][0-9]:[0-9][0-9]/;
 const timeNow = pattern.exec(new Date())[0];
@@ -24,8 +25,6 @@ bitbar([
 ]);
 
 function getNamaz(namazes, timeNow) {
-  //console.log(timeNow);
-  //onsole.log(namazes);
   let curr;
   for (var i = 0; i < namazes.length - 1; i++) {
     if (timeNow > namazes[i] && timeNow < namazes[i + 1]) {
@@ -46,6 +45,7 @@ function getDiff(time1, time2) {
     parseInt(time2.substring(0, 2), 10) * 60 +
     parseInt(time2.substring(3, time1.length), 10);
   let diff = time1mins - time2mins;
+  timediff = diff;
   var quotient = Math.floor(diff / 60);
   var remainder = diff % 60;
   return (
@@ -61,5 +61,11 @@ function getRandomColor() {
   for (var i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
+  if (timediff < 30) {
+    color = "red";
+  }
   return color;
+}
+function sendDiff(str) {
+  return str;
 }
